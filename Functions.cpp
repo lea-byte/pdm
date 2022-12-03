@@ -58,3 +58,45 @@ double Potential_type(int localization, int type){
     cout << "state generator  ";
     return X0;
 }; */
+
+vector<double> rate_vector(int type1, int type2){
+    vector<double> k(length, 0);
+    int A = 1; double eps; double tau_chem;
+
+    if(type1 == 1){
+        if(type2 == 2){
+            A = A12;
+            eps = eps1;
+            tau_chem = t0_chem_12;
+        } else if(type2 == 3){
+            A = A13;
+            eps = eps2;
+            tau_chem = t0_chem_13;
+        }
+    } else if(type1 == 2){
+        if(type2 == 1){
+            eps = eps1;
+            tau_chem = t0_chem_12;
+        } else if(type2 == 3){
+            A = A23;
+            eps = eps3;
+            tau_chem = t0_chem_23;
+        }
+    } else if(type1 == 3){
+        if(type2 == 1){
+            eps = eps2;
+            tau_chem = t0_chem_13;
+        } else if(type2 == 2){
+            eps = eps3;
+            tau_chem = t0_chem_23;
+        }
+    }
+        for (size_t i = 0; i < length; i++)
+        {
+           k[i] = A*(1/tau_chem)*exp(- max(Potential_type(i, type2)-Potential_type(i, type1), 0.) + eps);
+           cout << i << "  Potential_type(i, type2) "<< Potential_type(i, type2) << " Potential_type(i, type1) " << Potential_type(i, type1) << endl;
+        }
+        
+    return k;
+
+}

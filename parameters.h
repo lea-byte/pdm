@@ -18,12 +18,12 @@ double xf; // final position
     //Potential
     double V0; 
     int step = 25;//if potential is step function
-    double eps1 = 0.01; //btw 1 and 2
-    double eps2 = 0.02; //btw 1 and 3   
-    double eps3 = 0.03; //btw 2 and 3
+    double eps1 = 0;//0.01; //btw 1 and 2
+    double eps2 = 0;//0.02; //btw 1 and 3   
+    double eps3 = 0;//0.03; //btw 2 and 3
     //System inf
     int type = 1; //type by default of a molecule (or initially)
-    double step_max = 80000000; //max time of simulation
+    double step_max = 1; //max time of simulation
     int length = 50;
     double nbr_part = 1;
     //Chemical moves

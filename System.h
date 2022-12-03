@@ -30,6 +30,9 @@ class System{
         vector<double> get_syst_state_time3() const;
         sym_map2D<int, Move> get_syst_moves() const;
         double get_syst_time() const;
+        vector<double> get_flux12() const;
+        vector<double> get_flux13() const;
+        vector<double> get_flux23() const;
 
         void syst_initialize_moves();
         void syst_evolve() ;//select move and delete it + update states

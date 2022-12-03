@@ -12,26 +12,26 @@ class Chem: virtual public Move{
         void compute_move_rate() override {
             if(type == 1){
                     // transfo 1 to 2
-                    rate_chem1 = A12*(1/t0_chem_12)*exp(- max(Potential_type(loc1, -type+3)-Potential_type(loc0, type), 0.) + eps1);
-                if(nbr_part == 2){   
+                    rate_chem1 = A12*(1/t0_chem_12)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.) + eps1);
+                if(nbr_type == 2){   
                     rate_chem2 =0;
-                } else if(nbr_part == 3){ //transfo 1 to 3
-                    rate_chem2 = A13*(1/t0_chem_13)*exp(- max(Potential_type(loc1, -type+4)-Potential_type(loc0, type), 0.) + eps2);
+                } else if(nbr_type == 3){ //transfo 1 to 3
+                    rate_chem2 = A13*(1/t0_chem_13)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) + eps2);
                 } 
             } else if(type == 2){
                 // transfo 2 to 1
-                 rate_chem2 = (1/t0_chem_12)*exp(- max(Potential_type(loc1, -type+3)-Potential_type(loc0, type), 0.) + eps1);
-                if(nbr_part == 2){                    
+                 rate_chem2 = (1/t0_chem_12)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.) + eps1);
+                if(nbr_type == 2){                    
                     rate_chem1 = 0; //transfo 2 to 3
-                } else if (nbr_part == 3){
-                    rate_chem1 = A23*(1/t0_chem_23)*exp(- max(Potential_type(loc1, -type+5)-Potential_type(loc0, type), 0.) + eps3);
+                } else if (nbr_type == 3){
+                    rate_chem1 = A23*(1/t0_chem_23)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) + eps3);
                 }
                 
             } else if(type == 3){
                  // transfo 3 to 2
-                    rate_chem2 = (1/t0_chem_23)*exp(- max(Potential_type(loc1, -type+5)-Potential_type(loc0, type), 0.) + eps3);
+                    rate_chem2 = (1/t0_chem_23)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.) + eps3);
                  // transfo 3 to 1   
-                    rate_chem1 = (1/t0_chem_13)*exp(- max(Potential_type(loc1, -type+4)-Potential_type(loc0, type), 0.) + eps2);
+                    rate_chem1 = (1/t0_chem_13)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.) + eps2);
                 }
             
 
@@ -46,6 +46,7 @@ class Chem: virtual public Move{
             //type =-type0 +3; 
             type = t;
             compute_move_rate(); 
+            //cout << "loc1: " << loc1 << " loc2: " << loc0 << " type: " << type << " rate_chem1: " << rate_chem1 << " rate_chem2: " << rate_chem2 << endl;
         };
         ~Chem() = default;
 
@@ -64,14 +65,14 @@ class Chem: virtual public Move{
             //cout <<"OG type: " << type << " rate_chem1: " << rate_chem1 << " rate_chem2: " << rate_chem2 << " rand: " << rand <<endl;
                 if(rand < rate_chem1 ){
                     //reaction 1 chosen
-                    //cout << "reaction 1 chosen " << (type + 1) % 2 + 2 <<endl;
-                    return (type + 1) % 3 + 1;
+                    //cout << "reaction 1 chosen " << (type % 3) + 1 <<endl;
+                    return (type % 3) + 1;
                     //return (type + 1) % 2 + 2;
                 } else {
                     //reaction 2 chosen
-                    //cout << "reaction 2 chosen " << ((type + 1) % 4) % 3 + 1<<endl;
+                    //cout << "reaction 2 chosen " << (type + 1) % 3 + 1 <<endl;
                     
-                    return (type % 3) + 1;
+                    return (type + 1) % 3 + 1;
                     //return ((type + 1) % 4) % 3 + 1;
 
                 }

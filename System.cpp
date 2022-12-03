@@ -85,6 +85,15 @@ double System::get_syst_time() const{
     return time;
 };
 
+vector<double> System::get_flux12() const{
+    return flux12;
+}
+vector<double> System::get_flux13() const{
+    return flux13;
+}
+vector<double> System::get_flux23() const{
+    return flux23;
+}
 //methods for class System
 /* void System::syst_actualize_move(int init, int final){
     double r = compute_rate(Potential(init), Potential(final));
@@ -266,11 +275,11 @@ void System::syst_evolve(){
     for (size_t i = 0; i < state.size(); i++)
         {   
             if(memory_state[i] == 1 && state[i] ==2){
-                flux12[i] += 1/time_step;
+                flux12[i] += time_step;
             } else if(memory_state[i] == 1 && state[i] ==3){
-                flux13[i] += 1/time_step;
+                flux13[i] += time_step;
             } else if(memory_state[i] == 2 && state[i] ==3){
-                flux23[i] += 1/time_step;
+                flux23[i] += time_step;
             }
             
         }

@@ -3,6 +3,8 @@
 #include "Move.cpp"
 #include "System.cpp"
 
+#include <string>
+
 int main() {
     
     ofstream fw("C:\\Users\\leagr\\Documents\\PdM\\General\\Result.txt", std::ofstream::out);
@@ -47,7 +49,13 @@ int main() {
 
         //begin Gillespie
         int step = 1;
+        int pourcentage = 1;
         while (step <= step_max) {
+            if(100*(double)step/step_max>pourcentage)
+            {
+                cout<<pourcentage<<"%"<<endl;
+                pourcentage++;
+            }
             D(cout<< "begin step:" << step << endl <<endl;);
             S.syst_evolve();
             D(cout<< "end" <<endl <<endl;);

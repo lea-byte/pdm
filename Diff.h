@@ -7,7 +7,9 @@ class Diff: public Move{
         //double tau_diff = 1;
         double rate_diff;
         int type;
-        void compute_move_rate() override {rate_diff = (1/t0_diff)*exp(- max(Potential_type(loc1, type)-Potential_type(loc0, type),0.));};
+        void compute_move_rate() override {rate_diff = (1/t0_diff)*exp(- max(Potential_type(loc1, type)-Potential_type(loc0, type),0.));
+        //cout << "rate_diff: " << rate_diff << endl;
+        };
             
     public:
         Diff() : Move() {};

@@ -12,26 +12,35 @@ class Chem: virtual public Move{
         void compute_move_rate() override {
             if(type == 1){
                     // transfo 1 to 2
-                    rate_chem1 = A12*(1/t0_chem_12)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.) + eps1);
+                    //double eps = min(Potential_type(loc1, 2), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 2)- Potential_type(loc0, type));
+                    rate_chem1 = A12*(1/t0_chem_12)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.) - 0.1*(1-loc0/length));
                 if(nbr_type == 2){   
                     rate_chem2 =0;
                 } else if(nbr_type == 3){ //transfo 1 to 3
-                    rate_chem2 = A13*(1/t0_chem_13)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) + eps2);
+                    //double epsbis = min(Potential_type(loc1, 3), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 3)- Potential_type(loc0, type));
+                    //rate_chem2 = (1/t0_chem_13)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) - loc0*0.7/length);
+                    //cout<< Potential_type(loc1, 3)-Potential_type(loc0, type) << endl;
+                    rate_chem2 = A13*(1/t0_chem_13)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.)  - 0.7*(1-loc0/length));//eps2);
                 } 
             } else if(type == 2){
                 // transfo 2 to 1
-                 rate_chem2 = (1/t0_chem_12)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.) + eps1);
+                //double eps = min(Potential_type(loc1, 1), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 1)- Potential_type(loc0, type));
+                rate_chem2 = (1/t0_chem_12)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.) - 0.1*(1-loc0/length));
                 if(nbr_type == 2){                    
                     rate_chem1 = 0; //transfo 2 to 3
                 } else if (nbr_type == 3){
-                    rate_chem1 = A23*(1/t0_chem_23)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) + eps3);
+                    //double epsbis = min(Potential_type(loc1, 3), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 3)- Potential_type(loc0, type));
+                    //cout<< Potential_type(loc1, 3)-Potential_type(loc0, type) << endl;
+                    rate_chem1 = A23*(1/t0_chem_23)*exp(- max(Potential_type(loc1, 3)-Potential_type(loc0, type), 0.) -  0.5*(loc0/length));
                 }
                 
             } else if(type == 3){
                  // transfo 3 to 2
-                    rate_chem2 = (1/t0_chem_23)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.) + eps3);
-                 // transfo 3 to 1   
-                    rate_chem1 = (1/t0_chem_13)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.) + eps2);
+                    //double eps = min(Potential_type(loc1, 2), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 2)- Potential_type(loc0, type));
+                    rate_chem2 = (1/t0_chem_23)*exp(- max(Potential_type(loc1, 2)-Potential_type(loc0, type), 0.)  - 0.5*(loc0/length));
+                 // transfo 3 to 1 
+                    //double epsbis = min(Potential_type(loc1, 1), Potential_type(loc0, type)) + 0.5*abs(Potential_type(loc1, 1)- Potential_type(loc0, type));  
+                    rate_chem1 = (1/t0_chem_13)*exp(- max(Potential_type(loc1, 1)-Potential_type(loc0, type), 0.)  - 0.7*(1-loc0/length));
                 }
             
 

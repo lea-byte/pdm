@@ -12,19 +12,27 @@ double Potential_type(int localization, int type){
     if (type == 1){
              /* if (localization < step) return 0;
         else return V0;   */ 
-        return (tanh(0.07*(localization - length/2))+1)*0.5;
+        return (tanh(0.07*(localization - length/2))+1)*0.5*V01;//0.07
     } else if (type == 2) {
               /* if (localization < step) return 0;
         else return V0; */   
-        return (tanh(0.1*(localization - length/2))+1)*0.5;
+        return (tanh(0.1*(localization - length/2))+1)*0.5*V02;//0.1
     } else if (type == 3) {
             /* if (localization < step) return 0;
         else return V0;   */
-        return (tanh(0.2*(localization - length/2))+1)*0.5;
+        return (tanh(0.2*(length/2-localization))+1)*0.5*V03;//0.2
     }
     return 0;
 };
 
+    /*double epsilon_fct(int i){
+        double eps=0;
+        if(i>=0 and i<length){
+            eps = i*(0.7/length);
+        } else {cout << "warning eps" << endl;
+                return 0.;}
+        return eps;
+    }
 /* double compute_rate(double init_pot, double final_pot, bool diff = true, bool chem = false){
     if (diff){
         return (1/t0_diff)*exp(- (final_pot-init_pot));
@@ -59,7 +67,7 @@ double Potential_type(int localization, int type){
     return X0;
 }; */
 
-vector<double> rate_vector(int type1, int type2){
+/* vector<double> rate_vector(int type1, int type2){
     vector<double> k(length, 0);
     int A = 1; double eps; double tau_chem;
 
@@ -94,9 +102,9 @@ vector<double> rate_vector(int type1, int type2){
         for (size_t i = 0; i < length; i++)
         {
            k[i] = A*(1/tau_chem)*exp(- max(Potential_type(i, type2)-Potential_type(i, type1), 0.) + eps);
-           cout << i << "  Potential_type(i, type2) "<< Potential_type(i, type2) << " Potential_type(i, type1) " << Potential_type(i, type1) << endl;
+           //cout << i << "  Potential_type(i, type2) "<< Potential_type(i, type2) << " Potential_type(i, type1) " << Potential_type(i, type1) << endl;
         }
         
     return k;
 
-}
+} */

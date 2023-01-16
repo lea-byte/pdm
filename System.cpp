@@ -8,12 +8,14 @@ System::System(double t) {time = t;};
 System::System(int length, int nbr_part){//state initializer
     Length = length;
     Nbr_Part = nbr_part;
-    time = 0;
+    time = 0; time_flux=0;
+    counter = 0;
     state_time = vector<double> (Length, 0);
-    state_time1 = vector<double> (Length, 0); flux12 = vector<double> (Length, 0); 
-    state_time2 = vector<double> (Length, 0); flux13 = vector<double> (Length, 0);   
-    state_time3 = vector<double> (Length, 0); flux23 = vector<double> (Length, 0);
-
+    state_time1 = vector<double> (Length, 0); flux_chem12 = vector<double> (Length, 0);  count_1 = vector<double> (Length+1, 0); 
+    state_time2 = vector<double> (Length, 0); flux_chem13 = vector<double> (Length, 0);  count_2 = vector<double> (Length+1, 0);
+    state_time3 = vector<double> (Length, 0); flux_chem23 = vector<double> (Length, 0);  count_3 = vector<double> (Length+1, 0);
+    tdiff_1 = vector<double> (Length+1, 0); tdiff_2 = vector<double> (Length+1, 0); tdiff_3 = vector<double> (Length+1, 0);
+    tchem_1 = vector<double> (Length, 0); tchem_2 = vector<double> (Length, 0); tchem_3 = vector<double> (Length, 0);    
     set<int> occupied;
     set<int> empty;
 
@@ -85,21 +87,38 @@ double System::get_syst_time() const{
     return time;
 };
 
-vector<double> System::get_flux12() const{
-    return flux12;
+vector<double> System::get_flux_chem(int i, int j) const{
+    vector<double> flux(Length,0);
+    if (i == 1 && j ==2){
+        for (size_t i = 0; i < flux_chem12.size(); i++){
+            flux[i] = flux_chem12[i]/time_flux;
+        }
+        return flux;
+    } else if (i == 1 && j ==3){
+        for (size_t i = 0; i < flux_chem13.size(); i++){
+            flux[i] = flux_chem13[i]/time_flux;
+        }
+        return flux;
+    } else if (i == 2 && j ==3){
+        for (size_t i = 0; i < flux_chem23.size(); i++){
+            flux[i] = flux_chem23[i]/time_flux;
+        }
+        return flux;
+    }
+    else {
+        cout << "check arguments in get_flux_chem()" << endl;
+        return{0.};
+    }
 }
-vector<double> System::get_flux13() const{
-    return flux13;
-}
-vector<double> System::get_flux23() const{
-    return flux23;
-}
+
+
 //methods for class System
 /* void System::syst_actualize_move(int init, int final){
     double r = compute_rate(Potential(init), Potential(final));
     System::moves.Add(Move(init, final));
 };
  */
+
 
 
 /* void System::add_chem(int loc){
@@ -118,6 +137,7 @@ vector<double> System::get_flux23() const{
         ;//mobe 3 to 2
         
 }} */
+
 
 
 void System::syst_initialize_moves(){
@@ -226,13 +246,15 @@ void System::syst_evolve(){
     vector<Move*> ID_moves;
     vector<int> memory_state = state;
     compute_syst_cum_rates(cum_rates, ID_moves);
+    counter += 1;
    
     //random time step generator
     static default_random_engine generator;
     exponential_distribution<double> distribution_exp(cum_rates.back());
     double time_step = distribution_exp(generator);
     time += time_step;
-    D(cout << "step time generated: " << time_step << endl;)
+
+    //cout << "step time generated: " << time_step << endl;
 
     //random number generator
     static std::default_random_engine Generator;
@@ -249,7 +271,9 @@ void System::syst_evolve(){
     D(cout << "distance: "<< distance(cum_rates.begin(), lower_bound(cum_rates.begin(), cum_rates.end(), rand))<< endl;)
     D(cout<< "identify move to do " << endl;)
 
+
     //execute moves: update state
+    //CALCULATE RHO
         for (size_t i = 0; i < state_time.size(); i++)
         {
             if(state[i] != 0){
@@ -268,21 +292,107 @@ void System::syst_evolve(){
             //D(cout << "state_time[" << i <<"]=" << state_time[i] <<endl;)
             }
         }
-        
-        
-    syst_actualize_state(move_selected);
+    //BEGINNING
+    if (counter > 500000){
+    time_flux += time_step;
+    //FLUX DIFF
+    if(move_selected->get_move_loc_fin() > move_selected->get_move_loc_init()){
 
-    for (size_t i = 0; i < state.size(); i++)
-        {   
-            if(memory_state[i] == 1 && state[i] ==2){
-                flux12[i] += time_step;
-            } else if(memory_state[i] == 1 && state[i] ==3){
-                flux13[i] += time_step;
-            } else if(memory_state[i] == 2 && state[i] ==3){
-                flux23[i] += time_step;
+        //if(state[move_selected->get_move_loc_fin()] == 0){   
+            
+            if(state[move_selected->get_move_loc_init()] == 1){
+                            //flux_diff_1[move_selected->get_move_loc_fin()]+= move_selected->get_move_rate();//1/time_step;
+                            count_1[move_selected->get_move_loc_fin()]+=1;
+                            //tdiff_1[move_selected->get_move_loc_fin()]+=time_step;
+            } else if(state[move_selected->get_move_loc_init()] == 2){
+                            //flux_diff_2[move_selected->get_move_loc_fin()]+= move_selected->get_move_rate();//1/time_step;
+                            count_2[move_selected->get_move_loc_fin()]+=1;
+                            //tdiff_2[move_selected->get_move_loc_fin()]+=time_step;
+            } else if(state[move_selected->get_move_loc_init()] == 3){
+                            //flux_diff_3[move_selected->get_move_loc_fin()]+= move_selected->get_move_rate();//1/time_step;
+                            count_3[move_selected->get_move_loc_fin()]+=1;
+                            //tdiff_3[move_selected->get_move_loc_fin()]+=time_step;
+            }
+
+        //} else 
+        if (state[move_selected->get_move_loc_fin()] == 1){
+                            //flux_diff_1[move_selected->get_move_loc_fin()]-= move_selected->get_move_rate();//1/time_step;
+                            count_1[move_selected->get_move_loc_fin()]-=1;
+        //} else 
+        }if (state[move_selected->get_move_loc_fin()] == 2){
+                            //flux_diff_2[move_selected->get_move_loc_fin()]-= move_selected->get_move_rate();//1/time_step;
+                            count_2[move_selected->get_move_loc_fin()]-=1;
+        //} else 
+        }if (state[move_selected->get_move_loc_fin()] == 3){
+                            //flux_diff_2[move_selected->get_move_loc_fin()]-= move_selected->get_move_rate();//1/time_step;
+                            count_3[move_selected->get_move_loc_fin()]-=1;
+        }           
+                 
+    } else if(move_selected->get_move_loc_fin() < move_selected->get_move_loc_init()){
+                
+        //if(state[move_selected->get_move_loc_fin()] == 0){ 
+                    if(state[move_selected->get_move_loc_init()] == 1){
+                        //flux_diff_1[move_selected->get_move_loc_init()]-= move_selected->get_move_rate();//1/time_step;
+                        count_1[move_selected->get_move_loc_init()]-=1;
+                        //tdiff_1[move_selected->get_move_loc_init()]+=time_step;
+                    } else if(state[move_selected->get_move_loc_init()] == 2){
+                        //flux_diff_2[move_selected->get_move_loc_init()]-= move_selected->get_move_rate();//1/time_step;
+                        count_2[move_selected->get_move_loc_init()]-=1;
+                        //tdiff_2[move_selected->get_move_loc_init()]+=time_step;
+                    } else if(state[move_selected->get_move_loc_init()] == 3){
+                        //flux_diff_3[move_selected->get_move_loc_init()]-= move_selected->get_move_rate();//1/time_step;
+                        count_3[move_selected->get_move_loc_init()]-=1;
+                        //tdiff_3[move_selected->get_move_loc_init()]+=time_step;
+                    }
+        //} else 
+        if(state[move_selected->get_move_loc_fin()] == 1){
+                    //flux_diff_1[move_selected->get_move_loc_init()]+= move_selected->get_move_rate();//1/time_step;
+                    count_1[move_selected->get_move_loc_init()]+=1;
+        //} else 
+        if(state[move_selected->get_move_loc_fin()] == 2){
+                    //flux_diff_2[move_selected->get_move_loc_init()]+= move_selected->get_move_rate();//1/time_step;
+                    count_2[move_selected->get_move_loc_init()]+=1;    
+        //} else 
+        }if(state[move_selected->get_move_loc_fin()] == 3){
+                    //flux_diff_3[move_selected->get_move_loc_init()]+= move_selected->get_move_rate();//1/time_step;
+                    count_3[move_selected->get_move_loc_init()]+=1;
+        }
+    } 
+
+    } } 
+    //end
+        
+    
+    //ACTUALIZE STATE
+
+    syst_actualize_state(move_selected);
+    
+    if(counter > 500000){
+    //FLUX CHEM
+        if(move_selected->get_move_loc_fin() == move_selected->get_move_loc_init()){
+            if(memory_state[move_selected->get_move_loc_fin()] == 1 ){
+                if(state[move_selected->get_move_loc_fin()] == 2){
+                flux_chem12[move_selected->get_move_loc_fin()] +=1;
+                } else if(state[move_selected->get_move_loc_fin()] == 3){
+                flux_chem13[move_selected->get_move_loc_fin()] +=1;
+                }
+            } else if(memory_state[move_selected->get_move_loc_fin()] == 2){
+                if(state[move_selected->get_move_loc_fin()] == 1){
+                flux_chem12[move_selected->get_move_loc_fin()] -=1;
+                } else if(state[move_selected->get_move_loc_fin()] == 3){
+                flux_chem23[move_selected->get_move_loc_fin()] +=1;
+                }
+            } else if(memory_state[move_selected->get_move_loc_fin()] == 3){
+                if(state[move_selected->get_move_loc_fin()] == 2){
+                flux_chem23[move_selected->get_move_loc_fin()] -=1;
+                } else if(state[move_selected->get_move_loc_fin()] == 1){
+                flux_chem13[move_selected->get_move_loc_fin()] -=1;
+                }
             }
             
         }
+    }
+     
 
     D(cout<< "actualize state according to move " << endl;)
     D(cout<< "move chosen between " << move_selected->get_move_loc_init() << " and "<< move_selected->get_move_loc_fin() << endl;);
@@ -355,6 +465,22 @@ void System::syst_evolve(){
 
 
 
-
+vector<double> System::get_flux_diff(int i) const{
+    vector<double> flux(Length+1,0);
+    if (i==1){
+        for(size_t i = 0; i<count_1.size(); ++i){
+                flux[i] = count_1[i]/time_flux;
+        }
+    } else if (i==2){
+        for(size_t i = 0; i<count_2.size(); ++i){
+                flux[i] = count_2[i]/time_flux;
+        }
+    } else if (i==3){
+        for(size_t i = 0; i<count_3.size(); ++i){
+                flux[i] = count_3[i]/time_flux;
+        }
+    }
+    return flux;
+}
 
 

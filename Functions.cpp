@@ -12,15 +12,15 @@ double Potential_type(int localization, int type){
     if (type == 1){
              /* if (localization < step) return 0;
         else return V0;   */ 
-        return (tanh(0.07*(localization - length/2))+1)*0.5*V01;//0.07
+        return (tanh(0.7*(localization - length/2))+1)*0.5*V01;//0.07
     } else if (type == 2) {
               /* if (localization < step) return 0;
         else return V0; */   
-        return (tanh(0.1*(localization - length/2))+1)*0.5*V02;//0.1
+        return (tanh(1*(localization - length/2))+1)*0.5*V02;//0.1
     } else if (type == 3) {
             /* if (localization < step) return 0;
         else return V0;   */
-        return (tanh(0.2*(length/2-localization))+1)*0.5*V03;//0.2
+        return (tanh(2*(length/2-localization))+1)*0.5*V03;//0.2
     }
     return 0;
 };
